@@ -19,6 +19,8 @@ eigenaar zichtbaar.
 - [Beveiliging](beveiliging.md) — hoe en waarom niets van buiten je huis kan schrijven
 - [Werkwijze](werkwijze.md) — wijziging maken, goedkeuren, toepassen, terugdraaien
 - [Apply-stap](runner-setup.md) — hoe de apply draait en waarom niet in de cloud
+- [Agent-webapp](agent-webapp.md) — laten voorstellen via een AI-agent en een eigen chat-app
+- [Agent-geheugen](agent-geheugen.md) — hoe de agent voorkeuren onthoudt
 
 ## Instance-specifieke referentie (privé)
 
