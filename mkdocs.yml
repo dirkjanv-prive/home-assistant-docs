@@ -29,8 +29,7 @@ nav:
   - Architectuur: architectuur.md
   - Beveiliging: beveiliging.md
   - Werkwijze: werkwijze.md
-  - Runner / apply-opties: runner-setup.md
-
+  - Apply-stap: runner-setup.md
 markdown_extensions:
   - admonition
   - pymdownx.highlight

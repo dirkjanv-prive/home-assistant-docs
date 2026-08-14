@@ -6,13 +6,16 @@ Home Assistant schrijven.**
 
 ## De kern: het huis pullt, de cloud pusht niet
 
-De apply gebeurt op je eigen HA-hardware. Een add-on daar pullt de gewenste staat
+De apply gebeurt op de HA-hardware zelf. Een add-on daar pullt de gewenste staat
 uit de (privé) Git-repo en past die lokaal toe. Er is dus geen server in de cloud
-die je huis kan bereiken, en geen HA-account met schrijf- of adminrechten dat
-buiten je netwerk bekend hoeft te zijn.
+die het huis kan bereiken, en geen HA-account met schrijf- of adminrechten dat
+buiten het thuisnetwerk bekend hoeft te zijn.
 
 De add-on praat met Home Assistant via de **Supervisor-proxy**, waardoor hij
 **helemaal geen HA-token** nodig heeft en "Protection mode" aan kan blijven.
+
+De keerzijde hiervan — waarom we bewust géén cloud-runner gebruiken — staat
+uitgewerkt op de [Apply-stap](runner-setup.md)-pagina.
 
 ## Wie kan wat
 
@@ -28,8 +31,11 @@ HA-hardware, met toegang tot alleen die ene privé-repo.
 
 ## Branch protection
 
-Zet op `main` "require pull request + 1 approval". Rechtstreeks pushen naar `main`
-kan dan niet; alles gaat via een PR met een reviewbare diff.
+Het uitgangspunt is dat elke wijziging via een pull request loopt, met een
+reviewbare diff. Waar het gekozen GitHub-plan het toelaat, wordt dat afgedwongen
+met "require pull request + 1 approval" op `main`, zodat rechtstreeks pushen niet
+kan. Los daarvan geldt: omdat de apply pas na een **handmatige knopdruk** gebeurt,
+komt er nooit iets ongezien op Home Assistant terecht.
 
 ## Rollback
 

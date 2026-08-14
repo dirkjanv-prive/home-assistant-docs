@@ -16,9 +16,9 @@ eigenaar zichtbaar.
 ## Inhoud
 
 - [Architectuur](architectuur.md) — het ontwerp en het diagram
-- [Beveiliging](beveiliging.md) — waarom niets van buiten je huis kan schrijven
+- [Beveiliging](beveiliging.md) — hoe en waarom niets van buiten je huis kan schrijven
 - [Werkwijze](werkwijze.md) — wijziging maken, goedkeuren, toepassen, terugdraaien
-- [Runner / apply-opties](runner-setup.md) — hoe je de apply-stap draait
+- [Apply-stap](runner-setup.md) — hoe de apply draait en waarom niet in de cloud
 
 ## Instance-specifieke referentie (privé)
 
@@ -31,19 +31,21 @@ Klik je hierop zonder toegang, dan geeft GitHub een 404 — dat is de bedoeling.
 
 ## Kernidee in het kort
 
-```
-bewerk desired/ --PR--> main        (review + merge op GitHub)
-                          |
-        druk "Config toepassen" in HA
-                          v
-   apply-add-on (op je HA-hardware)
-        pullt main (alleen-lezen GitHub-token)
-        past gewijzigde dashboards/automations toe
-        verifieert live == desired
+Zo komt een wijziging van een idee tot in Home Assistant:
+
+```mermaid
+flowchart TD
+    A["Bewerk desired/ en open een Pull Request"] --> B["Review + merge op GitHub<br/>(ook vanaf je telefoon)"]
+    B --> C["Druk 'Config toepassen' in Home Assistant"]
+    C --> D["apply-add-on op je HA-hardware"]
+    D --> E["Pullt main met een alleen-lezen GitHub-token"]
+    E --> F["Past de gewijzigde dashboards/automations toe"]
+    F --> G["Verifieert: live == desired"]
 ```
 
-Waarom dit prettig is:
+Waarom het zo is opgezet:
 
 - **Alles is terug te draaien** (elke wijziging is een Git-commit).
-- **Je keurt goed op je gemak**, ook vanaf je telefoon, met een leesbare diff.
-- **Niets van buiten je netwerk kan je huis wijzigen.**
+- **Goedkeuren kan op je gemak**, ook vanaf je telefoon, met een leesbare diff.
+- **Niets van buiten het thuisnetwerk kan Home Assistant wijzigen** — zie
+  [Beveiliging](beveiliging.md) en [Apply-stap](runner-setup.md).
