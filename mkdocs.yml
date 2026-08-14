@@ -31,6 +31,7 @@ nav:
   - Werkwijze: werkwijze.md
   - Apply-stap: runner-setup.md
   - Agent-geheugen: agent-geheugen.md
+  - Agent-webapp: agent-webapp.md
 markdown_extensions:
   - admonition
   - pymdownx.highlight
