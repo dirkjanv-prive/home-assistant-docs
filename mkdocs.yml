@@ -10,9 +10,9 @@ theme:
       toggle:
         icon: material/weather-night
         name: Donker thema
-    - scheme: slate
-      primary: teal
-      accent: teal
+    - scheme: default
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-sunny
         name: Licht thema
