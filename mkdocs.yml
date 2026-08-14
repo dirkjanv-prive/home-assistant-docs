@@ -4,15 +4,15 @@ theme:
   name: material
   language: nl
   palette:
-    - scheme: default
-      primary: teal
-      accent: teal
+    - scheme: slate
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-night
         name: Donker thema
-    - scheme: slate
-      primary: teal
-      accent: teal
+    - scheme: default
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-sunny
         name: Licht thema
@@ -29,9 +29,9 @@ nav:
   - Architectuur: architectuur.md
   - Beveiliging: beveiliging.md
   - Werkwijze: werkwijze.md
-  - Agent & chat-frontend: agent-chat.md
-  - Runner / apply-opties: runner-setup.md
-
+  - Apply-stap: runner-setup.md
+  - Agent-geheugen: agent-geheugen.md
+  - Agent-webapp: agent-webapp.md
 markdown_extensions:
   - admonition
   - pymdownx.highlight

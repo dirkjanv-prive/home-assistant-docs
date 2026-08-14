@@ -53,14 +53,17 @@ rechtstreeks in HA maakte. Draai je lokaal wanneer nodig.
 ### De agent en de chat-frontend (optioneel)
 Een AI-agent kan wijzigingen voor je voorstellen, en je kunt met die agent praten
 via een eigen chat-webapp (ook mobiel). De agent stelt alleen pull requests voor en
-raakt je huis nooit rechtstreeks aan. Zie [agent & chat-frontend](agent-chat.md).
+raakt je huis nooit rechtstreeks aan. Zie [agent-webapp](agent-webapp.md).
 
 ## Waarom deze opzet
 
 - **Alles is terug te draaien.** Elke wijziging is een Git-commit; "revert" +
   opnieuw toepassen draait hem netjes terug.
-- **Je keurt goed op je gemak**, ook vanaf je telefoon.
-- **Geen externe schrijftoegang tot je huis** (zie [beveiliging](beveiliging.md)).
+- **Goedkeuren kan op je gemak**, ook vanaf je telefoon, met een leesbare diff.
+- **Geen externe schrijftoegang tot het huis.** De apply draait op de HA-hardware;
+  waarom er bewust geen cloud-runner wordt gebruikt, staat op de
+  [Apply-stap](runner-setup.md)-pagina. Het beveiligingsmodel staat in
+  [Beveiliging](beveiliging.md).
 
 ## Wat buiten bereik valt
 

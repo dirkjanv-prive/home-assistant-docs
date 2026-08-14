@@ -1,44 +1,71 @@
-# De apply-stap draaien
+# Apply-stap: hoe de config in Home Assistant terechtkomt
 
-De apply (het daadwerkelijk toepassen van `desired/` op Home Assistant) moet
-ergens draaien. Omdat het beveiligingsuitgangspunt is dat **niets van buiten je
-netwerk** naar HA mag schrijven, draait de apply het liefst op je eigen
-HA-hardware.
+De "apply" is de stap die de goedgekeurde configuratie uit Git daadwerkelijk op
+Home Assistant toepast. Die stap draait bewust **op de HA-hardware zelf**, binnen
+het thuisnetwerk. Deze pagina beschrijft hoe dat werkt en waarom er geen
+cloud-runner aan te pas komt.
 
-## Aanbevolen: knop-add-on op de HA-hardware
+## Hoe het werkt
 
-Een Home Assistant-add-on draait op je HA-apparaat, luistert op een knop, en past
-bij een druk de nieuwste config toe. Praat met HA via de Supervisor-proxy (geen
-token nodig). De enige secret is een alleen-lezen GitHub-token.
+Een Home Assistant-add-on draait op het HA-apparaat en luistert op een knop. Bij
+een druk op **Config toepassen** doorloopt de add-on deze stappen:
 
-Voordelen:
+1. **Pullt** de laatste `main` uit de privé-config-repo, met een **alleen-lezen**
+   GitHub-token.
+2. **Snapshot**: bewaart eerst de huidige config lokaal, zodat terugdraaien altijd
+   kan.
+3. **Past toe**: schrijft alleen de gewijzigde dashboards en automations naar Home
+   Assistant, via de **Supervisor-proxy** (dus zonder apart HA-token).
+4. **Verifieert**: leest terug en controleert dat de live staat gelijk is aan
+   `desired/`. Het resultaat verschijnt in een statusveld op het dashboard.
 
-- Geen externe schrijftoegang tot HA.
-- Geen HA-account met admin/schrijfrechten nodig.
-- Jij bepaalt wanneer (knopdruk), geen constant pollen.
+Wat dit betekent:
 
-Benodigde helpers in HA:
+- De apply gebeurt **binnen het thuisnetwerk**; er is geen dienst buiten het huis
+  die Home Assistant kan bereiken.
+- Er is **geen HA-account met schrijf- of adminrechten** nodig buiten het netwerk.
+- **Jij bepaalt het moment** (de knopdruk); er wordt niet constant gepolld.
 
-- Een **knop** (`input_button`), bijv. "Config toepassen".
-- Een **tekstveld** (`input_text`) voor de status.
+De benodigde onderdelen in HA zijn een knop (`input_button`) en een tekstveld
+(`input_text`) voor de status, samen op een dashboard.
 
-Zet die met een knop-kaart en een entiteit-kaart op een dashboard.
+## Waarom geen cloud-runners
 
-## Alternatief: cloud-runner (afgeraden voor privé-HA)
+Een voor de hand liggend alternatief is de apply in een GitHub Actions-workflow op
+een cloud-runner draaien. Dat doen we bewust **niet**, om deze redenen:
 
-Je kunt de apply ook in een GitHub Actions-workflow draaien op een runner. Dat
-werkt technisch, maar vereist dat de runner je HA kan bereiken en een
-schrijf-token heeft. Voor een privé-HA betekent dat schrijftoegang vanuit de
-cloud, wat het beveiligingsvoordeel van het knop-model tenietdoet. Alleen
-zinvol als je HA toch al bewust vanuit de cloud beheerd wordt.
+- **Het doorbreekt het uitgangspunt.** Een cloud-runner zou Home Assistant vanaf
+  buiten moeten kunnen bereiken én een schrijf-token nodig hebben. Dat is precies
+  de externe schrijftoegang tot het huis die deze opzet wil vermijden.
+- **Het vergt een bevoorrechte sleutel buiten het huis.** Een schrijf-token (en
+  meestal een admin-account) zou dan in de cloud bewaard worden, in plaats van dat
+  er alleen een alleen-lezen token binnen het thuisnetwerk staat.
+- **Hosted runners zijn vaak niet beschikbaar.** In organisatie- of
+  enterprise-omgevingen staan door GitHub gehoste runners regelmatig uit.
+- **Een self-hosted runner is feitelijk hetzelfde als de add-on.** Wil je toch een
+  runner, dan zet je die in je eigen netwerk — en dan heb je in de praktijk de
+  add-on-aanpak van hierboven, maar dan omslachtiger.
 
-Let op bij runners:
+Kortom: de apply hoort thuis op de HA-hardware. Een cloud-runner zou de
+beveiligingswinst tenietdoen zonder iets wezenlijks toe te voegen.
 
-- **Hosted runners** kunnen door een organisatie/enterprise zijn uitgeschakeld.
-- **Self-hosted runners** zijn gratis, maar geven de host toegang; die zet je dan
-  liefst in je eigen netwerk (wat feitelijk neerkomt op de add-on hierboven).
+## Export en token-rechten
+
+Naast *apply* (Git → HA) kan de add-on ook *exporteren* (HA → Git): de live
+HA-staat terugschrijven naar `desired/`, rechtstreeks naar `main` of naar een
+branch met een Pull Request. Zie [Werkwijze](werkwijze.md).
+
+Dit heeft gevolgen voor het GitHub-token op de HA-hardware:
+
+- Alleen *apply* gebruiken? Dan volstaat een **alleen-lezen** token.
+- Ook *exporteren*? Dan is een **read-write** token nodig (Contents: read/write,
+  en Pull requests: read/write voor de PR-variant), gescoped op alleen deze repo.
+
+Belangrijk: dit blijft een **GitHub**-token. Er komt geen schrijftoegang tot Home
+Assistant van buiten je netwerk bij; export leest HA en schrijft naar GitHub.
 
 ## Lokale terugval
 
-Zonder add-on of runner kun je de apply altijd handmatig lokaal draaien vanaf een
-PC met toegang tot HA. Zie [werkwijze](werkwijze.md).
+Naast de knop kan de apply ook handmatig lokaal draaien vanaf een PC met toegang
+tot Home Assistant. Dat is handig bij het opzetten of debuggen. Zie
+[Werkwijze](werkwijze.md) voor de commando's.
