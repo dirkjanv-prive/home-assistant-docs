@@ -1,9 +1,19 @@
 # home-assistant-docs
 
-Publieke, niet-gevoelige documentatie voor het "Home Assistant GitOps met een
-knop"-patroon. Gepubliceerd via GitHub Pages.
+Publieke documentatie voor het "Home Assistant GitOps met een knop"-patroon,
+gebouwd met [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) en
+gepubliceerd via GitHub Pages.
+
+Live: https://dirkjanv-prive.github.io/home-assistant-docs/
 
 De instance-specifieke referentie (entiteiten, URL's) staat in een aparte
-privé-repo en is alleen voor de eigenaar zichtbaar.
+prive-repo en is alleen voor de eigenaar zichtbaar.
 
-Start bij [index.md](index.md).
+## Lokaal bekijken
+
+```
+pip install mkdocs-material
+mkdocs serve
+```
+
+De bronbestanden staan in `docs/`; de navigatie staat in `mkdocs.yml`.

@@ -1,0 +1,46 @@
+site_name: Home Assistant GitOps
+site_description: GitOps-beheer voor Home Assistant met een knop
+theme:
+  name: material
+  language: nl
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Donker thema
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Licht thema
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - toc.integrate
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Architectuur: architectuur.md
+  - Beveiliging: beveiliging.md
+  - Werkwijze: werkwijze.md
+  - Runner / apply-opties: runner-setup.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: true
+
+plugins:
+  - search
