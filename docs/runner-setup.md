@@ -49,6 +49,21 @@ een cloud-runner draaien. Dat doen we bewust **niet**, om deze redenen:
 Kortom: de apply hoort thuis op de HA-hardware. Een cloud-runner zou de
 beveiligingswinst tenietdoen zonder iets wezenlijks toe te voegen.
 
+## Export en token-rechten
+
+Naast *apply* (Git → HA) kan de add-on ook *exporteren* (HA → Git): de live
+HA-staat terugschrijven naar `desired/`, rechtstreeks naar `main` of naar een
+branch met een Pull Request. Zie [Werkwijze](werkwijze.md).
+
+Dit heeft gevolgen voor het GitHub-token op de HA-hardware:
+
+- Alleen *apply* gebruiken? Dan volstaat een **alleen-lezen** token.
+- Ook *exporteren*? Dan is een **read-write** token nodig (Contents: read/write,
+  en Pull requests: read/write voor de PR-variant), gescoped op alleen deze repo.
+
+Belangrijk: dit blijft een **GitHub**-token. Er komt geen schrijftoegang tot Home
+Assistant van buiten je netwerk bij; export leest HA en schrijft naar GitHub.
+
 ## Lokale terugval
 
 Naast de knop kan de apply ook handmatig lokaal draaien vanaf een PC met toegang
