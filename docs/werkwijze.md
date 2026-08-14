@@ -27,9 +27,22 @@ Elke wijziging is een commit:
 
 ## Wijzigingen die je rechtstreeks in HA maakte (drift)
 
-Pas je iets aan in de HA-interface zelf, dan loopt de repo achter. Een lokaal
-**export**-script leest HA terug naar `desired/`; draai dat wanneer je zulke
-wijzigingen wilt vastleggen, en commit het resultaat via een PR.
+Pas je iets aan in de HA-interface zelf (een dashboard, een automation), dan loopt
+de repo achter. Je legt die "drift" vast met een **export**, en dat kan op twee
+manieren, allebei als knop op het Beheer-dashboard:
+
+- **Exporteren naar branch + PR** — de export komt op een nieuwe branch en opent
+  een Pull Request, zodat je de wijzigingen eerst reviewt voor ze in `main` landen.
+  Dit is de veilige standaard.
+- **Exporteren naar main** — de export gaat rechtstreeks naar `main`, zonder
+  tussenstap. Sneller, maar zonder review.
+
+Beide lezen alleen HA en schrijven naar GitHub; er komt geen schrijftoegang tot HA
+van buiten je netwerk bij. De export-knoppen vergen wel een GitHub-token met
+schrijfrechten (zie [Apply-stap](runner-setup.md)).
+
+Als terugval kun je hetzelfde ook lokaal draaien met `scripts/export_ha.py` vanaf
+een PC met toegang tot HA.
 
 ## Lokale terugval (zonder de knop)
 
