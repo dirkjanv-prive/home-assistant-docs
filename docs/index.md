@@ -18,6 +18,7 @@ eigenaar zichtbaar.
 - [Architectuur](architectuur.md) — het ontwerp en het diagram
 - [Beveiliging](beveiliging.md) — waarom niets van buiten je huis kan schrijven
 - [Werkwijze](werkwijze.md) — wijziging maken, goedkeuren, toepassen, terugdraaien
+- [Agent & chat-frontend](agent-chat.md) — laten voorstellen via een AI-agent en een eigen chat-app
 - [Runner / apply-opties](runner-setup.md) — hoe je de apply-stap draait
 
 ## Instance-specifieke referentie (privé)
