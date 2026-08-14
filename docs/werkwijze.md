@@ -1,5 +1,11 @@
 # Werkwijze — dagelijks gebruik
 
+Elke wijziging aan Home Assistant loopt via Git: je stelt hem voor in een pull
+request, keurt hem goed (met een leesbare diff, ook op je telefoon), en past hem
+daarna met een knop toe. Zo blijft alles zichtbaar, reviewbaar en terug te
+draaien. Waarom die apply op de HA-hardware draait en niet in de cloud, staat op
+de [Apply-stap](runner-setup.md)-pagina.
+
 ## Een wijziging maken en toepassen
 
 1. **Branch + wijziging.** Maak een nieuwe branch en bewerk het betreffende
