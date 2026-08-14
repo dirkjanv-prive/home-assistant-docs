@@ -14,20 +14,34 @@ buiten het thuisnetwerk bekend hoeft te zijn.
 De add-on praat met Home Assistant via de **Supervisor-proxy**, waardoor hij
 **helemaal geen HA-token** nodig heeft en "Protection mode" aan kan blijven.
 
-De keerzijde hiervan — waarom we bewust géén cloud-runner gebruiken — staat
+De keerzijde hiervan, waarom we bewust géén cloud-runner gebruiken, staat
 uitgewerkt op de [Apply-stap](runner-setup.md)-pagina.
 
 ## Wie kan wat
 
 | Component | Sleutel | Kan schrijven naar HA? |
 |-----------|---------|------------------------|
-| Auteur / agent (voorstellen) | geen | Nee |
+| Auteur / agent (voorstellen) | geen | Nee (geen directe verbinding met HA) |
+| Agent (live lezen/bedienen via HA-gebruiker) | niet-admin HA-gebruiker | Ja, alleen states lezen en apparaten bedienen, geen configuratie |
 | GitHub (opslag + review) | je GitHub-account | Nee (bewaart alleen de gewenste staat) |
 | apply-add-on (bij jou thuis) | alleen-lezen GitHub-token + Supervisor-proxy | Ja, lokaal, alleen na jouw knopdruk |
 | Jij | je GitHub-account + de knop | Beslist wat en wanneer |
 
 De enige sleutel buiten je netwerk is een **alleen-lezen GitHub-token** op de
 HA-hardware, met toegang tot alleen die ene privé-repo.
+
+De agent gebruikt daarnaast een **standaard (niet-admin) Home Assistant-gebruiker**
+voor live toegang. Daarmee kan hij:
+
+- de actuele toestand van entiteiten lezen (bijvoorbeeld sensorwaarden);
+- services aanroepen om apparaten te bedienen.
+
+Omdat het geen admin-gebruiker is, kan de agent via deze weg **geen configuratie
+lezen of wijzigen**: dashboards, automations, add-ons en andere configuratie
+blijven exclusief via GitHub Pull Requests lopen.
+
+Er is bewust geen pure read-only rol gekozen, omdat Home Assistant geen echte
+read-only rol kent en bediening via de agent gewenst is.
 
 ## Branch protection
 
