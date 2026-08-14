@@ -1,57 +1,67 @@
-# Agent-geheugen en voorkeuren
+# Agent-geheugen
 
-Deze documentatie beschrijft hoe de Home Assistant Config Agent omgaat met geheugen en voorkeuren, specifiek in deze omgeving waar de managed Memory-functie van Azure niet beschikbaar is.
+Deze pagina beschrijft hoe het repo-gebaseerde geheugen van de Home Assistant Config Agent werkt, en waarom daarvoor een markdown-bestand wordt gebruikt in plaats van de native managed memory-functie van Azure.
 
-## Overzicht
+## Waarom repo-gebaseerd geheugen?
 
-De agent heeft twee bronnen van "geheugen":
+In deze omgeving is Azure managed Memory niet beschikbaar. Er is dus geen externe geheugenservice die voorkeuren en langetermijninformatie voor de agent kan bewaren.
 
-1. **Instructies in de systeem- en developerlaag**: Dit zijn vaste regels die het gedrag van de agent bepalen.
-2. **Repo-gebaseerde personalisatie (Optie B)**: Een langetermijngeheugenbestand in de private configuratierepo, dat via Pull Requests wordt bijgewerkt.
+Het gekozen alternatief is geheugen via versiebeheer:
 
-De tweede optie is toegevoegd om duurzame voorkeuren van Dirk-Jan vast te leggen zonder gebruik te maken van een externe managed memory store.
+- Geheugen wordt vastgelegd in een bestand in een Git-repository.
+- Elke wijziging loopt via een branch en Pull Request.
+- Het geheugen is daarmee traceerbaar, reproduceerbaar en onder versiebeheer.
 
-## Repo-gebaseerde personalisatie (Optie B)
+Zo blijft duidelijk welke voorkeuren wanneer zijn toegevoegd, en kan elke wijziging expliciet worden beoordeeld voordat die effect krijgt.
 
-### Geheugenbestand
+## Structuur van het geheugen
+
+De agent heeft twee typen broninformatie:
+
+1. **Vaste instructies**: systeem- en developerinstructies, die het algemene gedrag van de agent bepalen.
+2. **Repo-gebaseerd geheugen**: een markdown-bestand in de private configuratierepo dat duurzame voorkeuren vastlegt.
+
+De tweede bron is specifiek bedoeld voor langetermijnvoorkeuren die tijdens gebruik ontstaan, zoals communicatiestijl, documentatie-afspraken of Home Assistant-conventies.
+
+## Het geheugenbestand
 
 In de private repo `home-assistant-config` staat het bestand:
 
 - `agent/voorkeuren.md`
 
-Dit bestand functioneert als langetermijngeheugen voor de `ha-config-agent`:
+Dit bestand fungeert als langetermijngeheugen:
 
-- De agent leest dit bestand aan het begin van elke taak.
+- De agent leest het aan het begin van elke taak.
 - Het bevat beknopte, geordende voorkeuren (communicatie, documentatie, stijl, enzovoort).
-- De inhoud wordt als aanvullende instructie gebruikt naast de vaste systeem- en developerregels.
+- De inhoud wordt gebruikt als aanvullende instructie bovenop de vaste systeem- en developerregels.
 
-### Bijwerken van voorkeuren
+## Wijzigen van voorkeuren
 
-Wanneer Dirk-Jan tijdens het gebruik een **duurzame voorkeur** uitspreekt (een regel die voor toekomstige taken moet blijven gelden):
+Wanneer tijdens gebruik een **duurzame voorkeur** wordt genoemd (bedoeld om in toekomstige taken te blijven gelden), gaat dit als volgt:
 
-- De agent interpreteert of dit een langetermijnvoorkeur is.
-- Bij twijfel vraagt de agent kort om bevestiging.
-- Vervolgens stelt de agent een wijziging aan `agent/voorkeuren.md` voor:
-  - via een aparte branch in `home-assistant-config`,
-  - met een commit die alleen dit bestand aanpast,
-  - en een Pull Request met een korte Nederlandse titel en uitleg.
+- De agent bepaalt of het om een langetermijnvoorkeur gaat.
+- Bij twijfel vraagt de agent kort om verduidelijking.
+- Als het een duidelijke langetermijnvoorkeur is, stelt de agent een wijziging aan `agent/voorkeuren.md` voor.
 
-Na het mergen van de PR wordt de nieuwe voorkeur automatisch meegenomen bij volgende taken, omdat de agent het bestand telkens opnieuw inleest.
+Die wijziging verloopt via de configuratierepo:
 
-### Afbakening en privacy
+- Er wordt een branch in `home-assistant-config` gebruikt.
+- De commit past alleen het geheugenbestand (of een beperkt aantal gerelateerde regels) aan.
+- Er wordt een Pull Request geopend met een korte Nederlandse titel en uitleg.
 
-- Repo-gebaseerde personalisatie staat **alleen** in de private repo `home-assistant-config`.
-- Er worden geen persoonlijke voorkeuren of gevoelige details in de publieke docs-repo opgeslagen.
-- De publieke documentatie (deze pagina) beschrijft het mechanisme generiek, zonder concrete voorkeuren of gevoelige data.
+Pas na het mergen van de Pull Request gelden de nieuwe voorkeuren. Omdat de agent het bestand bij elke taak inleest, worden aangepaste voorkeuren automatisch meegenomen.
 
-## Relatie met andere documentatie
+## Afbakening en privacy
 
-- De algemene documentatieregels voor gevoelige gegevens blijven gelden: gevoelige of instance-specifieke details gaan naar `home-assistant-config/docs/referentie.md`.
-- Dit geheugenmechanisme sluit aan op die aanpak: het is bewust repo-gebaseerd en volledig onder versiebeheer.
+Het repo-gebaseerde geheugen houdt rekening met de scheiding tussen publieke en private documentatie:
+
+- Geheugen (voorkeuren en instance-specifieke details) staat in de private repo `home-assistant-config`.
+- Persoonlijke of gevoelige gegevens komen niet terecht in de publieke docs-repo.
+- Deze pagina beschrijft het mechanisme generiek, zonder het geheugenbestand zelf of concrete voorkeuren weer te geven.
 
 ## Samenvatting
 
-- Omdat Azure managed Memory niet beschikbaar is in deze regio gebruikt de agent een **repo-gebaseerd geheugenbestand** (`agent/voorkeuren.md`).
-- De agent leest dit bestand bij elke taak in.
-- Duurzame voorkeuren worden via een branch en Pull Request aan dit bestand toegevoegd of aangepast.
-- Zo blijft het gedrag van de agent voorspelbaar, reproduceerbaar en onder versiebeheer, zonder externe geheugenservice.
+- Azure managed Memory is in deze omgeving niet beschikbaar, daarom wordt geheugen repo-gebaseerd ingericht.
+- Het geheugen leeft in een markdown-bestand in de private configuratierepo: `agent/voorkeuren.md`.
+- De agent leest dit bestand bij elke taak in en gebruikt het als aanvullende bron van voorkeuren.
+- Wijzigingen aan het geheugenbestand lopen altijd via branch en Pull Request, zodat alles onder versiebeheer blijft en expliciet kan worden beoordeeld.
