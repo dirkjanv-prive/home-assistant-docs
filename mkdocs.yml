@@ -30,6 +30,7 @@ nav:
   - Beveiliging: beveiliging.md
   - Werkwijze: werkwijze.md
   - Apply-stap: runner-setup.md
+  - Agent-geheugen: agent-geheugen.md
 markdown_extensions:
   - admonition
   - pymdownx.highlight
