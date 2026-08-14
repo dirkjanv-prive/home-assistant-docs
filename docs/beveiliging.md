@@ -1,64 +1,46 @@
-# Beveiligingsmodel
+# Beveiliging
 
-Dit patroon bestuurt echte apparaten in huis. De beveiliging is daarom bewust
-gelaagd, met als belangrijkste principe: **niets van buiten je netwerk kan naar
-Home Assistant schrijven.**
+## Uitgangspunten
 
-## De kern: het huis pullt, de cloud pusht niet
+De kern van het ontwerp:
 
-De apply gebeurt op de HA-hardware zelf. Een add-on daar pullt de gewenste staat
-uit de (privé) Git-repo en past die lokaal toe. Er is dus geen server in de cloud
-die het huis kan bereiken, en geen HA-account met schrijf- of adminrechten dat
-buiten het thuisnetwerk bekend hoeft te zijn.
+- **Geen cloud-schrijftoegang tot je huis**: alleen de apply-add-on op de HA-hardware schrijft naar Home Assistant.
+- **Git is de bron van waarheid**: alle configuratiewijzigingen gaan via pull requests in een privérepo.
+- **Mens-in-de-loop**: je keurt elke wijziging goed en drukt zelf op Config toepassen.
 
-De add-on praat met Home Assistant via de **Supervisor-proxy**, waardoor hij
-**helemaal geen HA-token** nodig heeft en "Protection mode" aan kan blijven.
+Deze uitgangspunten blijven ook gelden als er nieuwe front-ends bijkomen (zoals een eigen webchat-app voor de agent).
 
-De keerzijde hiervan, waarom we bewust géén cloud-runner gebruiken, staat
-uitgewerkt op de [Apply-stap](runner-setup.md)-pagina.
+## Grenzen tussen onderdelen
 
-## Wie kan wat
+De architectuur houdt strikt onderscheid tussen:
 
-| Component | Sleutel | Kan schrijven naar HA? |
-|-----------|---------|------------------------|
-| Auteur / agent (voorstellen) | geen | Nee (geen directe verbinding met HA) |
-| Agent (live lezen/bedienen via HA-gebruiker) | niet-admin HA-gebruiker | Ja, alleen states lezen en apparaten bedienen, geen configuratie |
-| GitHub (opslag + review) | je GitHub-account | Nee (bewaart alleen de gewenste staat) |
-| apply-add-on (bij jou thuis) | alleen-lezen GitHub-token + Supervisor-proxy | Ja, lokaal, alleen na jouw knopdruk |
-| Jij | je GitHub-account + de knop | Beslist wat en wanneer |
+- **Home Assistant**: draait thuis; alleen de apply-add-on schrijft configuratie.
+- **Configrepo** (privé GitHub): opslag van gewenste dashboards/automations; alleen Git-clients schrijven hier.
+- **Agents**: lezen en schrijven uitsluitend via de configrepo en bedienen Home Assistant alleen via de standaard HA-API.
+- **Front-ends** (Foundry-playground, webchat-app): UI-laag voor mensagent-interactie.
 
-De enige sleutel buiten je netwerk is een **alleen-lezen GitHub-token** op de
-HA-hardware, met toegang tot alleen die ene privé-repo.
+Een nieuwe front-end verandert niets aan wie waar mag schrijven; hij biedt alleen een ander UI-kanaal naar dezelfde agent.
 
-De agent gebruikt daarnaast een **standaard (niet-admin) Home Assistant-gebruiker**
-voor live toegang. Daarmee kan hij:
+## Webchat-app voor de agent
 
-- de actuele toestand van entiteiten lezen (bijvoorbeeld sensorwaarden);
-- services aanroepen om apparaten te bedienen.
+Wanneer je een eigen webchat-app bovenop de agent zet, gelden extra aandachtspunten:
 
-Omdat het geen admin-gebruiker is, kan de agent via deze weg **geen configuratie
-lezen of wijzigen**: dashboards, automations, add-ons en andere configuratie
-blijven exclusief via GitHub Pull Requests lopen.
+- **Authenticatie**: bescherm de webapp met een identitylaag (bijvoorbeeld Entra ID) en beperk toegang tot bekende gebruikers.
+- **Geheimen**: laat de backend van de webapp de agent aanroepen via een veilige mechaniek zonder opgeslagen API-sleutels, bijvoorbeeld met een platform-identiteit in plaats van een hardcoded key.
+- **Scope**: zorg dat de webapp alleen bij de agent kan, niet rechtstreeks bij Home Assistant of de apply-add-on.
 
-Er is bewust geen pure read-only rol gekozen, omdat Home Assistant geen echte
-read-only rol kent en bediening via de agent gewenst is.
+Zo blijft de beveiligingsgrens uit de basisarchitectuur intact: alleen de apply-add-on raakt Home Assistant-configuratie, en alleen na merge en een handmatige knopdruk.
 
-## Branch protection
+## Config-pipeline en knoppen
 
-Het uitgangspunt is dat elke wijziging via een pull request loopt, met een
-reviewbare diff. Waar het gekozen GitHub-plan het toelaat, wordt dat afgedwongen
-met "require pull request + 1 approval" op `main`, zodat rechtstreeks pushen niet
-kan. Los daarvan geldt: omdat de apply pas na een **handmatige knopdruk** gebeurt,
-komt er nooit iets ongezien op Home Assistant terecht.
+De config-pipeline wordt bestuurd vanuit Home Assistant zelf:
 
-## Rollback
+- **Config toepassen**: triggert de apply-add-on om `desired/` uit `main` toe te passen.
+- **Export naar main/branch**: legt drift (wijzigingen direct in HA) vast in de repo, met of zonder PR.
 
-Elke wijziging is een Git-commit. Terugdraaien is: revert de commit, merge, en
-druk opnieuw op de knop. De add-on maakt bovendien vóór elke apply een snapshot.
+Front-ends en agents mogen deze pipeline niet omzeilen:
 
-## Publieke vs. privé documentatie
+- Front-ends sturen alleen opdrachten naar de agent.
+- De agent mag nooit deze knoppen in HA zelf bedienen; dat blijft een menselijke handeling.
 
-Deze site is publiek en bevat bewust **geen** instance-specifieke gegevens (geen
-URL's, geen entiteit-namen, geen apparaatlijsten). Die staan in een privé-repo en
-zijn alleen voor de eigenaar zichtbaar. Links naar die privé-referentie geven
-voor anderen een 404.
+Zo blijft er een duidelijke scheiding tussen interactie (chat, UI) en configuratie-toepassing (add-on op de HA-hardware).
