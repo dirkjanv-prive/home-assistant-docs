@@ -1,0 +1,29 @@
+name: notify-hub
+
+# On every push to main, tell the docs-hub repo to rebuild the aggregated site
+# (https://docs.vandervecht.eu/) so this repo's changes go live immediately instead
+# of waiting for the hub's daily cron.
+#
+# Requires a repository secret HUB_DISPATCH_TOKEN: a fine-grained personal access
+# token scoped to the dirkjanv-prive/docs-hub repository with Contents: Read and
+# write permission (needed to create a repository dispatch event).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docs-hub rebuild
+        run: |
+          curl -sSf -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.HUB_DISPATCH_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/dirkjanv-prive/docs-hub/dispatches \
+            -d '{"event_type":"source-updated"}'
