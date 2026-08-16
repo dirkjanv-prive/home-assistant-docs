@@ -46,23 +46,23 @@ opgeslagen credentials), niet via tokens in de instructies.
 
 ## Waar leeft welke code?
 
-De oplossing bestaat uit vijf codebases. Drie zijn GitHub-repositories, twee zijn
-(voorlopig) alleen lokaal op de beheer-pc.
+De oplossing bestaat uit vijf codebases, alle vijf GitHub-repositories (de
+agent- en webapp-repo's zijn privé, de config-, add-on- en docs-repo's naar keuze).
 
 | Onderdeel | Locatie | In Git? | Draait waar |
 |-----------|---------|---------|-------------|
-| Agent-instructies + deploy-script | `ha-foundry-agent/` (lokaal) | nee | wordt naar Foundry gepubliceerd |
-| Chat-webapp | `ha-agent-webapp/` (lokaal) | nee | Azure App Service |
+| Agent-instructies + deploy-script | `ha-foundry-agent` (privé-repo) | ja | wordt naar Foundry gepubliceerd |
+| Chat-webapp | `ha-agent-webapp` (privé-repo) | ja | Azure App Service |
 | Config + apply/export-scripts | `home-assistant-config` (repo) | ja | scripts draaien in de add-on / lokaal |
 | Apply-add-on | `ha-config-apply-addon` (repo) | ja | op de HA-hardware |
 | Deze documentatie | `home-assistant-docs` (repo) | ja | GitHub Pages |
 
-!!! warning "Let op: twee mappen staan niet in Git"
-    `ha-foundry-agent/` (de bron van de agent-instructies) en `ha-agent-webapp/`
-    (de webapp) staan alleen lokaal. De echte "bron van waarheid" voor de agent is
-    de gepubliceerde versie in Foundry, en voor de webapp de gedeplooide code in
-    App Service. Overweeg deze twee mappen alsnog in een privé-repo te zetten, dan
-    heb je ook daar versiebeheer en back-up.
+!!! note "De agent- en webapp-code staan in privé-repo's"
+    `ha-foundry-agent` (de bron van de agent-instructies) en `ha-agent-webapp` (de
+    webapp) staan in privé-repo's op GitHub, met een `.gitignore` die secrets en
+    build-artefacten uitsluit. De "bron van waarheid" voor wat live draait blijft de
+    gepubliceerde versie in Foundry en de gedeployde code in App Service; de repo's
+    geven versiebeheer en back-up.
 
 ## Onderdeel 1: de agent (instructies + versies)
 
